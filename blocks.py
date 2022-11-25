@@ -23,16 +23,15 @@ class ConvBlock(nn.Module):
             layers.append(nn.BatchNorm2d(num_features=out_channels))
 
         if activation is not None:
-            match activation:
-                case 'leakyrelu':
-                    layers.append(nn.LeakyReLU(0.2, inplace=True))
-                case 'prelu':
-                    layers.append(nn.PReLU())
-                case 'tanh':
-                    layers.append(nn.Tanh())
-                case other:
-                    raise RuntimeError(
-                        'Unsupported activation function:', activation)
+            if activation == 'leakyrelu':
+                layers.append(nn.LeakyReLU(0.2, inplace=True))
+            elif activation == 'prelu':
+                layers.append(nn.PReLU())
+            elif activation == 'tanh':
+                layers.append(nn.Tanh())
+            else:
+                raise RuntimeError(
+                    'Unsupported activation function:', activation)
 
         self.net = nn.Sequential(*layers)
 

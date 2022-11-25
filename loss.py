@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 import torchvision.models as models
-import utils
+from config import DEVICE
 
-# Implementation of loss terms for SRGAN as defined in https://arxiv.org/pdf/1609.04802.pdf
+# Implementation of content loss for SRGAN as defined in https://arxiv.org/pdf/1609.04802.pdf
 
 
 class ContentLoss(nn.Module):
@@ -17,7 +17,7 @@ class ContentLoss(nn.Module):
         super().__init__()
         # Here we take the output up to the 36th layer, which is the activation after
         # the last convolution in VGG19. Other options we could use are: 4, 9, 18, 27.
-        self.vgg19 = models.vgg19(pretrained=True).features[:36].eval().to(utils.DEVICE)
+        self.vgg19 = models.vgg19(pretrained=True).features[:36].eval().to(DEVICE)
         # Euclidean distance is just MSE loss between feature map and reference
         self.dist = nn.MSELoss()
 

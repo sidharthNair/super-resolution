@@ -1,5 +1,4 @@
 from math import log2
-import torch
 import torch.nn as nn
 
 from blocks import ConvBlock, ResidualBlock, UpsampleBlock
@@ -87,13 +86,13 @@ class Discriminator(nn.Module):
 
         # Classifies whether the input is LR or HR
         # Two dense layers with a final sigmoid activation for classification
+        # Sigmoid is not present here because we will use BCEWithLogitsLoss during training
         self.classifier_block = nn.Sequential(
             nn.AdaptiveAvgPool2d(output_size=(6, 6)),
             nn.Flatten(),
             nn.Linear(512 * 6 * 6, 1024),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Linear(1024, 1),
-            nn.Sigmoid()
+            nn.Linear(1024, 1)
         )
 
     def forward(self, x):
