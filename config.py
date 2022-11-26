@@ -1,7 +1,8 @@
 import torch
 
 PRETRAIN = True
-LOAD = True
+TEST = True
+LOAD = False
 SAVE = True
 CHECKPOINT_GEN = 'checkpoint_gen.pth'
 CHECKPOINT_DISC = 'checkpoint_disc.pth'

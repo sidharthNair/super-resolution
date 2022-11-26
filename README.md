@@ -8,3 +8,16 @@ We implemented SRGAN as described in [<em>Photo-Realistic Single Image Super-Res
 Network</em>](https://arxiv.org/pdf/1609.04802.pdf)
 
 ![image](https://user-images.githubusercontent.com/84476225/198865448-44935565-bc64-4849-9c99-64f45be3d54b.png)
+
+## Data
+
+Put data in `/data`. Expected structure is:
+```
+.
+├── class1_directory
+│   ├── img1_file
+│   ├── img2_file
+│   └── ...
+├── class2_directory
+└── ...
+```

@@ -7,6 +7,7 @@ from tqdm import tqdm
 from loss import ContentLoss
 from models import Generator, Discriminator
 from data import CustomDataset
+from test import test_generator
 
 torch.backends.cudnn.benchmark = True
 
@@ -99,6 +100,9 @@ def main():
         if config.SAVE:
             save(gen, gen_optimizer, config.CHECKPOINT_GEN)
             save(disc, disc_optimizer, config.CHECKPOINT_DISC)
+
+        if config.TEST:
+            test_generator(gen, prefix=f'{epoch}_')
 
 if __name__ == "__main__":
     main()
