@@ -4,14 +4,21 @@ from PIL import Image
 import models
 import os
 
+# Upscale given image using Super Resolution
 def upscale(generator, image):
+    # TODO perform Super Resolution on image
     return image
 
+# Run image to demo
 def run_image(generator, imagePath, imageName):
+    # Load image
     image = cv2.imread(os.path.join(imagePath, imageName))
+    # Upscale image using Super Resolution
     upscaleImage = upscale(generator, image)
+    # Save image
     cv2.imwrite(imagePath+"/up_"+imageName, upscaleImage)
 
+# Run video to demo
 def run_video(generator, videoPath, videoName):
     # Extract frames from video and store in temp folder
     print(os.path.join(videoPath, videoName))
@@ -23,15 +30,19 @@ def run_video(generator, videoPath, videoName):
     print(width)
     print(height)
 
-    if not os.path.exists("temp/"):
-        os.mkdir("temp/")
+    frameFolder = "./temp/"
+
+    if not os.path.exists(frameFolder):
+        os.mkdir(frameFolder)
+    
     index = 0
     frameNum = 0
+
     while True:
         hasNext, frame = cap.read()
         if hasNext:
             frameName = "frame_"+str(index)+".png"
-            cv2.imwrite("/temp/"+frameName, frame)
+            cv2.imwrite(frameFolder+frameName, frame)
             index += 1
 
             frameNum += fps
@@ -39,11 +50,14 @@ def run_video(generator, videoPath, videoName):
         else:
             break
     
-    
+    # Run Super Resolution on individual frames
     for i in range(index):
-        run_image(generator, "/temp/","frame_"+str(i)+".png")
+        run_image(generator, frameFolder,"frame_"+str(i)+".png")
 
-    frameFolder = "/temp/"
+
+    
+
+    # Convert upscaled images into upscaled video
     imgs = [img for img in os.listdir(frameFolder) if img.startswith("up_") and img.endswith(".png")]
     
     fourcc = cv2.VideoWriter_fourcc(*'MP4V')
@@ -54,6 +68,7 @@ def run_video(generator, videoPath, videoName):
 
     cv2.destroyAllWindows()
     upVideo.release()
+    print("Output video stored at: "+videoPath+"/up_"+videoName)
 
 
 
