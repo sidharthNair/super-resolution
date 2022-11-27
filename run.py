@@ -13,6 +13,7 @@ from config import *
 from models import Generator
 
 from datetime import datetime
+import time
 import shutil
 
 transform = A.Compose([
@@ -100,6 +101,8 @@ def run_video(generator, videoPath, videoName):
     print("Output video stored at: "+videoPath+"/up_"+videoName)
 
 def run_camera(generator, downscaling_factor=1):
+    prev_frame_time = 0
+    new_frame_time = 0
     cam = cv2.VideoCapture(0)
     k = -1
     cv2.namedWindow('Original', cv2.WINDOW_NORMAL)
@@ -109,6 +112,12 @@ def run_camera(generator, downscaling_factor=1):
     with torch.no_grad():
         while k == -1:
             ret_val, img = cam.read()
+            new_frame_time = time.time()
+            fps = 1 / (new_frame_time - prev_frame_time)
+            prev_frame_time = new_frame_time
+            cv2.setWindowTitle('Original', f'Original, FPS: {int(fps)}')
+            cv2.setWindowTitle('SR Upscaled', f'SR Upscaled, FPS: {int(fps)}')
+            cv2.setWindowTitle('Bicubic Upscaled', f'Bicubic Upscaled, FPS: {int(fps)}')
             img = cv2.resize(img, (0, 0), fx=1 / downscaling_factor, fy=1 / downscaling_factor, interpolation=cv2.INTER_CUBIC)
             transformed = transform(image=img)["image"].unsqueeze(0).to(DEVICE)
             upscaled = np.moveaxis((generator(transformed) * 0.5 + 0.5).cpu().numpy()[0], 0, 2)
@@ -116,7 +125,9 @@ def run_camera(generator, downscaling_factor=1):
             cv2.imshow('Original', img)
             cv2.imshow('SR Upscaled', upscaled)
             cv2.imshow('Bicubic Upscaled', bicubic)
-            k = cv2.waitKey(10)
+            k = cv2.waitKey(1)
+    cam.release()
+    cv2.destroyAllWindows()
 
 def main():
     start = datetime.now()
@@ -134,7 +145,7 @@ def main():
     elif userInput == '2':
         run_video(generator, "./demo/", "videoTest.mp4")
     elif userInput == '3':
-        run_camera(generator, 6)
+        run_camera(generator, 4)
     end = datetime.now()
     print("Elapsed Time: ", (end-start).total_seconds(), "s")
 
