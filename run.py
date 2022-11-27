@@ -99,6 +99,20 @@ def run_video(generator, videoPath, videoName):
     upVideo.release()
     print("Output video stored at: "+videoPath+"/up_"+videoName)
 
+def run_camera(generator, downscaling_factor=1):
+    cam = cv2.VideoCapture(0)
+    k = -1
+
+    with torch.no_grad():
+        while k == -1:
+            ret_val, img = cam.read()
+            img = cv2.resize(img, (0, 0), fx=1 / downscaling_factor, fy=1 / downscaling_factor, interpolation=cv2.INTER_CUBIC)
+            transformed = transform(image=img)["image"].unsqueeze(0).to(DEVICE)
+            upscaled = np.moveaxis((generator(transformed) * 0.5 + 0.5).cpu().numpy()[0], 0, 2)
+            img = cv2.resize(img, (0, 0), fx=4, fy=4, interpolation=cv2.INTER_NEAREST)
+            cv2.imshow(f"Original (down scaling factor = {downscaling_factor}", img)
+            cv2.imshow(f"Upscaled (hold any key to exit)", upscaled)
+            k = cv2.waitKey(10)
 
 def main():
     start = datetime.now()
@@ -107,14 +121,16 @@ def main():
     checkpoint = torch.load(GEN_FILE, map_location=DEVICE)
     generator.load_state_dict(checkpoint["state_dict"])
 
-    print("Do you want to run the image (1) or video (2)?")
-    print("Enter '1' or '2': ")
+    print("Do you want to run the image (1), video (2), camera (3)?")
+    print("Enter '1', '2', or '3': ")
     userInput = input()
     #userInput = '2'
     if userInput == '1':
         run_image(generator, "./demo/","baboon.png")
     elif userInput == '2':
         run_video(generator, "./demo/", "videoTest.mp4")
+    elif userInput == '3':
+        run_camera(generator, 8)
     end = datetime.now()
     print("Elapsed Time: ", (end-start).total_seconds(), "s")
 
