@@ -15,9 +15,9 @@ class ContentLoss(nn.Module):
     # the pre-trained VGG19 network).
     def __init__(self):
         super().__init__()
-        # Here we take the output up to the 36th layer, which is the activation after
-        # the last convolution in VGG19. Other options we could use are: 4, 9, 18, 27.
-        self.vgg19 = models.vgg19(pretrained=True).features[:36].eval().to(DEVICE)
+        # Here we take the output up to the 18th layer, which is the activation before
+        # the 3rd maxpooling layer in VGG19. Other options we could use are: 4, 9, 27, 36.
+        self.vgg19 = models.vgg19(pretrained=True).features[:18].eval().to(DEVICE)
         # Euclidean distance is just MSE loss between feature map and reference
         self.dist = nn.MSELoss()
 
