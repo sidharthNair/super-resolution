@@ -54,7 +54,7 @@ def run_video(generator, videoPath, videoName):
         shutil.rmtree(frameFolder)
     if not os.path.exists(frameFolder):
         os.mkdir(frameFolder)
-    
+
     index = 0
     frameNum = 0
 
@@ -71,13 +71,13 @@ def run_video(generator, videoPath, videoName):
         else:
             break
     print(str(index) + " frames extracted ...")
-    
+
     # Run Super Resolution on individual frames
     for i in range(index):
         run_image(generator, frameFolder,"frame_"+str(i).zfill(3)+".png")
 
 
-    
+
 
     # Convert upscaled images into upscaled video
     imgs = [img for img in os.listdir(frameFolder) if img.startswith("up_") and img.endswith(".png")]
@@ -104,7 +104,7 @@ def main():
     start = datetime.now()
     # Load generator
     generator = Generator(in_channels=CHANNELS, scaling_factor=SCALE_FACTOR).to(DEVICE)
-    checkpoint = torch.load(CHECKPOINT_GEN, map_location=DEVICE)
+    checkpoint = torch.load(GEN_FILE, map_location=DEVICE)
     generator.load_state_dict(checkpoint["state_dict"])
 
     print("Do you want to run the image (1) or video (2)?")
