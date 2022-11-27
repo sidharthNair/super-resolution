@@ -106,8 +106,8 @@ def run_camera(generator, downscaling_factor=1):
     cam = cv2.VideoCapture(0)
     k = -1
     cv2.namedWindow('Original', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('Bicubic Downscaled', cv2.WINDOW_NORMAL)
     cv2.namedWindow('SR Upscaled', cv2.WINDOW_NORMAL)
-    cv2.namedWindow('Bicubic Upscaled', cv2.WINDOW_NORMAL)
 
     with torch.no_grad():
         while k == -1:
@@ -116,15 +116,14 @@ def run_camera(generator, downscaling_factor=1):
             fps = 1 / (new_frame_time - prev_frame_time)
             prev_frame_time = new_frame_time
             cv2.setWindowTitle('Original', f'Original, FPS: {int(fps)}')
+            cv2.setWindowTitle('Bicubic Downscaled', f'Bicubic Downscaled, FPS: {int(fps)}')
             cv2.setWindowTitle('SR Upscaled', f'SR Upscaled, FPS: {int(fps)}')
-            cv2.setWindowTitle('Bicubic Upscaled', f'Bicubic Upscaled, FPS: {int(fps)}')
-            img = cv2.resize(img, (0, 0), fx=1 / downscaling_factor, fy=1 / downscaling_factor, interpolation=cv2.INTER_CUBIC)
-            transformed = transform(image=img)["image"].unsqueeze(0).to(DEVICE)
+            bicubic = cv2.resize(img, (0, 0), fx=(1 / downscaling_factor), fy=(1 / downscaling_factor), interpolation=cv2.INTER_CUBIC)
+            transformed = transform(image=bicubic)["image"].unsqueeze(0).to(DEVICE)
             upscaled = np.moveaxis((generator(transformed) * 0.5 + 0.5).cpu().numpy()[0], 0, 2)
-            bicubic = cv2.resize(img, (0, 0), fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
             cv2.imshow('Original', img)
+            cv2.imshow('Bicubic Downscaled', bicubic)
             cv2.imshow('SR Upscaled', upscaled)
-            cv2.imshow('Bicubic Upscaled', bicubic)
             k = cv2.waitKey(1)
     cam.release()
     cv2.destroyAllWindows()
