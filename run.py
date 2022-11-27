@@ -102,6 +102,9 @@ def run_video(generator, videoPath, videoName):
 def run_camera(generator, downscaling_factor=1):
     cam = cv2.VideoCapture(0)
     k = -1
+    cv2.namedWindow('Original', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('SR Upscaled', cv2.WINDOW_NORMAL)
+    cv2.namedWindow('Bicubic Upscaled', cv2.WINDOW_NORMAL)
 
     with torch.no_grad():
         while k == -1:
@@ -109,9 +112,10 @@ def run_camera(generator, downscaling_factor=1):
             img = cv2.resize(img, (0, 0), fx=1 / downscaling_factor, fy=1 / downscaling_factor, interpolation=cv2.INTER_CUBIC)
             transformed = transform(image=img)["image"].unsqueeze(0).to(DEVICE)
             upscaled = np.moveaxis((generator(transformed) * 0.5 + 0.5).cpu().numpy()[0], 0, 2)
-            img = cv2.resize(img, (0, 0), fx=4, fy=4, interpolation=cv2.INTER_NEAREST)
-            cv2.imshow(f"Original (down scaling factor = {downscaling_factor}", img)
-            cv2.imshow(f"Upscaled (hold any key to exit)", upscaled)
+            bicubic = cv2.resize(img, (0, 0), fx=4, fy=4, interpolation=cv2.INTER_CUBIC)
+            cv2.imshow('Original', img)
+            cv2.imshow('SR Upscaled', upscaled)
+            cv2.imshow('Bicubic Upscaled', bicubic)
             k = cv2.waitKey(10)
 
 def main():
@@ -130,7 +134,7 @@ def main():
     elif userInput == '2':
         run_video(generator, "./demo/", "videoTest.mp4")
     elif userInput == '3':
-        run_camera(generator, 8)
+        run_camera(generator, 6)
     end = datetime.now()
     print("Elapsed Time: ", (end-start).total_seconds(), "s")
 
