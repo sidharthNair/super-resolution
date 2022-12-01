@@ -15,7 +15,7 @@ Network</em>](https://arxiv.org/pdf/1609.04802.pdf)
 
 ## Model
 
-[SRGAN Trained Model Files](https://drive.google.com/drive/folders/1JY2nZuanTdqid_lJ65mRdZfsasl__KQ3?usp=sharing) -- Trained for 4000 Epochs (2000 MSE Only, 2000 w/ Perceptual Loss)
+[SRGAN Trained Model Files](https://drive.google.com/drive/folders/1JY2nZuanTdqid_lJ65mRdZfsasl__KQ3?usp=sharing) -- Trained for 4000 Epochs (2000 MSE Only, 2000 w/ Perceptual Loss) on the [DIV2K](https://data.vision.ee.ethz.ch/cvl/DIV2K/) HR training dataset
 
 For testing, download gen.tar and place it in this repository's folder. Then, run `test.py` to generate SR images from the LR images in `test/` (output is in `test_output/`). Alternatively, you can run `run.py` to run it on an individual image, video, or webcam. For video and webcam streams it is recommended to be using an NVIDIA GPU or it will be very slow.
 
